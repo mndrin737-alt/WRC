@@ -1,0 +1,219 @@
+/* ============================================
+   WRES REPUBLICA - MAIN STYLESHEET
+   ============================================ */
+
+:root {
+    --primary-dark: #050505;
+    --panel-dark: #111111;
+    --border-dark: #222222;
+    --brand-blue: #0055FF;
+    --brand-red: #D81118;
+    --brand-gold: #FFD700;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--primary-dark);
+    color: white;
+    overflow-x: hidden;
+    font-family: 'Inter', sans-serif;
+}
+
+/* ============================================
+   GRADIENT & ANIMATIONS
+   ============================================ */
+
+.text-gradient-logo {
+    background: linear-gradient(to right, #0055FF, #ffffff, #D81118, #FFD700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 300% 100%;
+    animation: gradientMove 8s ease infinite;
+    padding-bottom: 0.1em;
+}
+
+@keyframes gradientMove {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes spinner {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fade-in-down {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.animate-fade-in-down {
+    animation: fade-in-down 0.6s ease-out;
+}
+
+.animate-fade-in {
+    animation: fade-in 0.8s ease-out;
+}
+
+/* ============================================
+   SCROLLBARS
+   ============================================ */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--primary-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-red);
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+
+.clip-notch {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+}
+
+.custom-scroll {
+    scroll-behavior: smooth;
+}
+
+/* ============================================
+   NAVIGATION
+   ============================================ */
+
+.nav-item {
+    color: #999;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.nav-item:hover {
+    color: white;
+}
+
+.nav-item.active {
+    color: var(--brand-red);
+    border-bottom: 2px solid var(--brand-red);
+}
+
+/* ============================================
+   PAGE SECTIONS
+   ============================================ */
+
+.page-section {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.page-section.active {
+    display: block;
+    opacity: 1;
+}
+
+/* ============================================
+   LOADER
+   ============================================ */
+
+.loader {
+    border-top-color: var(--brand-red);
+    animation: spinner 1.5s linear infinite;
+}
+
+/* ============================================
+   TABLES (For Wiki)
+   ============================================ */
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+th,
+td {
+    border: 1px solid #333;
+    padding: 0.75rem;
+    text-align: left;
+    color: #ccc;
+}
+
+th {
+    background-color: #1a1a1a;
+    color: var(--brand-gold);
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+}
+
+code {
+    background: #222;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+    color: var(--brand-red);
+    font-size: 0.85em;
+}
+
+/* ============================================
+   RESPONSIVE & UTILITY CLASSES
+   ============================================ */
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}

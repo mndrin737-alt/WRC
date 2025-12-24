@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wres Republica by MNDRiN Studios</title>
+    <meta name="description"
+        content="The ultimate wrestling sandbox. Exclusive download. Not available on Steam or Play Store.">
+    <link rel="icon" type="image/jpeg" href="assets/logos/Icon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Oswald:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Oswald', 'sans-serif'] },
+                    colors: { brand: { blue: '#0055FF', red: '#D81118', gold: '#FFD700', dark: '#050505', panel: '#111111', border: '#222222' } },
+                    backgroundImage: { 'dark-gradient': 'linear-gradient(to bottom, rgba(5,5,5,0) 0%, #050505 100%)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Gradient Text Animation */
+        .text-gradient-logo {
+            background: linear-gradient(to right, #0055FF, #ffffff, #D81118, #FFD700);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 300% 100%;
+            animation: gradientMove 8s ease infinite;
+            padding-bottom: 0.1em;
+            /* Prevents descenders from being cut off */
+        }
+
+        @keyframes gradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .clip-notch {
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+        }
+
+        .nav-item.active {
+            color: #D81118;
+            border-bottom: 2px solid #D81118;
+        }
+
+        .page-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .page-section.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D81118;
+        }
+
+        .loader {
+            border-top-color: #D81118;
+            animation: spinner 1.5s linear infinite;
+        }
+
+        @keyframes spinner {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Table Styles for Wiki */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        th,
+        td {
+            border: 1px solid #333;
+            padding: 0.75rem;
+            text-align: left;
+            color: #ccc;
+        }
+
+        th {
+            background-color: #1a1a1a;
+            color: #FFD700;
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+        }
+
+        code {
+            background: #222;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #D81118;
+            font-size: 0.85em;
+        }
+
+        /* New Animations */
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 10px rgba(0, 85, 255, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 20px rgba(0, 85, 255, 0.6);
+            }
+        }
+
+        .animate-slide-in-down {
+            animation: slideInDown 0.6s ease-out;
+        }
+
+        .animate-slide-in-up {
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        .animate-fade-scale {
+            animation: fadeInScale 0.5s ease-out;
+        }
+
+        .animate-glow {
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        /* Feature card hover effects */
+        .feature-card {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .feature-card:hover::before {
+            left: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Wiki sidebar styling */
+        .wiki-nav {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .wiki-nav::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .wiki-nav::-webkit-scrollbar-thumb {
+            background: #D81118;
+            border-radius: 2px;
+        }
+
+        /* Patch notes timeline */
+        .patch-timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .patch-dot {
+            position: absolute;
+            left: -0.65rem;
+            width: 1.3rem;
+            height: 1.3rem;
+            border-radius: 50%;
+            background: #D81118;
+            border: 2px solid #050505;
+            box-shadow: 0 0 15px rgba(216, 17, 24, 0.5);
+        }
+
+        /* Background overlay fix */
+        .hero-section {
+            position: relative;
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+            min-height: 85vh;
+        }
+
+        .wiki-page {
+            background: linear-gradient(135deg, rgba(5, 5, 5, 0.95) 0%, rgba(17, 17, 17, 0.95) 100%);
+        }
+
+        .patch-page {
+            background: linear-gradient(180deg, rgba(5, 5, 5, 0.95) 0%, rgba(17, 17, 17, 0.95) 100%);
+        }
+
+        /* Enhanced Animations */
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes buttonHover {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-2px);
+            }
+        }
+
+        @keyframes panelGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 15px rgba(0, 85, 255, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 0 25px rgba(0, 85, 255, 0.5);
+            }
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes bgBlur {
+            from {
+                backdrop-filter: blur(0px);
+            }
+
+            to {
+                backdrop-filter: blur(15px);
+            }
+        }
+
+        .animate-modal-slide-in {
+            animation: modalSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .animate-button-hover {
+            animation: buttonHover 0.6s ease-in-out;
+        }
+
+        .animate-panel-glow {
+            animation: panelGlow 3s ease-in-out infinite;
+        }
+
+        .animate-gradient-shift {
+            animation: gradientShift 8s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        .animate-bg-blur {
+            animation: bgBlur 0.4s ease-out forwards;
+        }
+
+        .button-animated {
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+        }
+
+        .button-animated:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .button-animated::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .button-animated:hover::after {
+            left: 100%;
+        }
+
+        /* Prevent shine on icon-only buttons */
+        .button-animated:has(i:only-child)::after {
+            display: none;
+        }
+
+        .feature-card-enhanced {
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card-enhanced:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(216, 17, 24, 0.3);
+        }
+
+        .feature-card-enhanced::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .feature-card-enhanced:hover::before {
+            transform: translateX(100%);
+        }
+
+        .panel-description {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .feature-card-enhanced:hover .panel-description {
+            max-height: 200px;
+            opacity: 1;
+        }
+
+        .modal-backdrop-blur {
+            backdrop-filter: blur(0px);
+            animation: bgBlur 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+
+    <nav class="fixed w-full z-50 bg-brand-dark/95 backdrop-blur-xl border-b border-brand-border animate-slide-in-down">
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0 cursor-pointer transform transition-all duration-300 hover:scale-110"
+                    onclick="router.navigate('home')">
+                    <img src="assets/logos/LogoSmall.png" alt="WRES REP"
+                        class="h-14 md:h-16 object-contain brightness-125 hover:brightness-150 transition-all duration-300 drop-shadow-lg"
+                        onerror="this.src='https://placehold.co/200x50/000000/FFF?text=WRES+REP'">
+                </div>
+                <div class="hidden lg:flex items-center space-x-1">
+                    <button onclick="router.navigate('home')"
+                        class="nav-item button-animated px-5 py-6 font-display text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-all active relative overflow-hidden"
+                        id="nav-home">Home</button>
+                    <button onclick="router.navigate('mods')"
+                        class="nav-item button-animated px-5 py-6 font-display text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-all relative overflow-hidden"
+                        id="nav-mods">Suite</button>
+                    <button onclick="router.navigate('docs')"
+                        class="nav-item button-animated px-5 py-6 font-display text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-all relative overflow-hidden"
+                        id="nav-docs">Wiki</button>
+                    <button onclick="router.navigate('patch')"
+                        class="nav-item button-animated px-5 py-6 font-display text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-all relative overflow-hidden"
+                        id="nav-patch">Updates <span
+                            class="ml-2 bg-brand-red text-white text-[9px] px-1 rounded animate-pulse">LIVE</span></button>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden md:flex text-[10px] text-gray-500 font-mono text-right mr-2">
+                        <div class="flex flex-col"><span>SERVER: <span
+                                    class="text-green-500">ONLINE</span></span><span>v1.0.4</span></div>
+                    </div>
+                    <button onclick="downloadManager.openModal()"
+                        class="button-animated bg-brand-red hover:bg-red-700 text-white px-5 py-2 clip-notch font-display font-bold uppercase tracking-wider text-xs shadow-[0_0_15px_rgba(216,17,24,0.4)] transition-all transform hover:scale-105 relative overflow-hidden"
+                        style="animation: fadeInScale 0.6s ease-out;">Download</button>
+                    <button class="lg:hidden text-white p-2 hover:scale-110 transition-transform"
+                        onclick="mobileMenu.toggle()"><i class="fa-solid fa-bars text-xl"></i></button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MOBILE MENU -->
+    <div id="mobile-menu"
+        class="fixed inset-0 z-40 bg-brand-dark transform translate-x-full transition-transform duration-300 lg:hidden pt-24 px-6">
+        <div class="flex flex-col space-y-4">
+            <button onclick="router.navigate('home'); mobileMenu.close()"
+                class="text-left text-2xl font-display uppercase font-bold text-white border-b border-white/10 pb-4">Home</button>
+            <button onclick="router.navigate('mods'); mobileMenu.close()"
+                class="text-left text-2xl font-display uppercase font-bold text-white border-b border-white/10 pb-4">Community
+                Creations</button>
+            <button onclick="router.navigate('docs'); mobileMenu.close()"
+                class="text-left text-2xl font-display uppercase font-bold text-white border-b border-white/10 pb-4">Wiki</button>
+            <button onclick="router.navigate('patch'); mobileMenu.close()"
+                class="text-left text-2xl font-display uppercase font-bold text-white border-b border-white/10 pb-4">Patch
+                Notes</button>
+        </div>
+    </div>
+
+    <main class="flex-grow relative">
+        <!-- HOME PAGE -->
+        <section id="page-home" class="page-section active pt-20">
+            <div class="relative min-h-[85vh] flex items-center justify-center overflow-hidden hero-section"
+                style="background-image: url('assets/images/BG.png');" id="hero-bg">
+                <div class="absolute inset-0 bg-gradient-to-b from-brand-dark/50 via-brand-dark/90 to-brand-dark z-10">
+                </div>
+
+                <div class="relative z-20 text-center px-4 max-w-6xl mx-auto">
+                    <!-- MNDRIN Tag -->
+                    <div
+                        class="inline-flex items-center gap-2 px-6 py-2 bg-black/80 backdrop-blur-md border border-brand-red/50 rounded-full mb-8 shadow-lg mt-4 animate-slide-in-down">
+                        <span class="w-2 h-2 rounded-full bg-brand-gold animate-pulse"></span>
+                        <span class="text-xs font-bold tracking-[0.2em] text-white uppercase">MNDRiN Studios
+                            Presents</span>
+                    </div>
+
+                    <img src="assets/logos/LogoSquare.png" alt="Logo"
+                        class="w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 mx-auto -mb-20 -mt-25 drop-shadow-2xl animate-fade-scale"
+                        onerror="this.src='https://placehold.co/300x300/000000/0055FF?text=WRES'">
+
+                    <!-- Main Title -->
+                    <h1
+                        class="font-display text-5xl md:text-7xl lg:text-8xl font-black uppercase italic leading-tight tracking-tighter mb-4 drop-shadow-2xl text-gradient-logo py-2">
+                        Customize. Upgrade. <br />Dominate.
+                    </h1>
+
+                    <!-- Sub Text -->
+                    <p
+                        class="font-display text-lg md:text-xl text-gray-400 uppercase tracking-[0.3em] font-light mb-12 opacity-90 animate-slide-in-up">
+                        - Build It Your Way -
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <button onclick="downloadManager.openModal()"
+                            class="w-full sm:w-auto button-animated bg-gradient-to-r from-brand-red to-red-600 hover:from-red-600 hover:to-red-700 text-white px-10 py-5 clip-notch font-display text-xl font-bold uppercase tracking-widest transition-all shadow-lg shadow-red-900/30 relative overflow-hidden">
+                            <span class="relative z-10">Download Now</span>
+                        </button>
+                        <button onclick="router.navigate('mods')"
+                            class="w-full sm:w-auto button-animated bg-white/5 hover:bg-white/15 border-2 border-white/30 hover:border-brand-blue text-white px-10 py-5 clip-notch font-display text-xl font-bold uppercase tracking-widest transition-all backdrop-blur-md relative overflow-hidden">
+                            <span class="relative z-10">Browse Mods</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="py-24 bg-brand-dark px-4 border-t border-brand-border">
+                <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div
+                        class="feature-card-enhanced bg-gradient-to-br from-brand-panel to-black p-8 border border-brand-blue/30 hover:border-brand-blue/70 group">
+                        <i
+                            class="fa-solid fa-earth-americas text-4xl text-brand-blue mb-6 group-hover:scale-125 transition-transform duration-300"></i>
+                        <h3 class="font-display text-2xl font-bold uppercase mb-2">Roaming Mode</h3>
+                        <p class="text-gray-400 text-sm mb-6">Walk out of the arena and into the streets. Interact with
+                            NPCs, start backstage brawls, and explore a living open world environment.</p>
+                        <div class="panel-description">
+                            <div class="space-y-2 text-xs text-gray-500 border-t border-gray-700 pt-4">
+                                <p>✓ Open World Exploration</p>
+                                <p>✓ NPC Interactions</p>
+                                <p>✓ Dynamic Events</p>
+                                <p>✓ Free Roam Combat</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="feature-card-enhanced bg-gradient-to-br from-brand-panel to-black p-8 border border-brand-red/30 hover:border-brand-red/70 group">
+                        <i
+                            class="fa-solid fa-handshake text-4xl text-brand-red mb-6 group-hover:scale-125 transition-transform duration-300"></i>
+                        <h3 class="font-display text-2xl font-bold uppercase mb-2">Career Simulation</h3>
+                        <p class="text-gray-400 text-sm mb-6">Negotiate contracts, handle injuries, and manage
+                            relationships. Your choices backstage affect your performance in the ring.</p>
+                        <div class="panel-description">
+                            <div class="space-y-2 text-xs text-gray-500 border-t border-gray-700 pt-4">
+                                <p>✓ Contract Negotiations</p>
+                                <p>✓ Injury Management</p>
+                                <p>✓ Relationship Building</p>
+                                <p>✓ Career Progression</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="feature-card-enhanced bg-gradient-to-br from-brand-panel to-black p-8 border border-brand-gold/30 hover:border-brand-gold/70 group">
+                        <i
+                            class="fa-solid fa-user-ninja text-4xl text-brand-gold mb-6 group-hover:scale-125 transition-transform duration-300"></i>
+                        <h3 class="font-display text-2xl font-bold uppercase mb-2">Hardcore Physics</h3>
+                        <p class="text-gray-400 text-sm mb-6">Interactive weaponry, breakable furniture, and a
+                            deterministic ragdoll system that makes every slam feel impactful.</p>
+                        <div class="panel-description">
+                            <div class="space-y-2 text-xs text-gray-500 border-t border-gray-700 pt-4">
+                                <p>✓ Destructible Environment</p>
+                                <p>✓ Realistic Ragdoll</p>
+                                <p>✓ Weapon Physics</p>
+                                <p>✓ Impact Effects</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- New Feature Cards -->
+                    <div
+                        class="feature-card-enhanced bg-gradient-to-br from-brand-panel to-black p-8 border border-purple-500/30 hover:border-purple-500/70 group">
+                        <i
+                            class="fa-solid fa-wand-magic-sparkles text-4xl text-purple-400 mb-6 group-hover:scale-125 transition-transform duration-300"></i>
+                        <h3 class="font-display text-2xl font-bold uppercase mb-2">Epic Entrances</h3>
+                        <p class="text-gray-400 text-sm mb-6">Create stunning entrance sequences with custom music,
+                            lighting effects, and choreography. Make your superstar unforgettable.</p>
+                        <div class="panel-description">
+                            <div class="space-y-2 text-xs text-gray-500 border-t border-gray-700 pt-4">
+                                <p>✓ Custom Music</p>
+                                <p>✓ Lighting Effects</p>
+                                <p>✓ Choreography Tools</p>
+                                <p>✓ Visual Effects</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="feature-card-enhanced bg-gradient-to-br from-brand-panel to-black p-8 border border-green-500/30 hover:border-green-500/70 group">
+                        <i
+                            class="fa-solid fa-toolbox text-4xl text-green-400 mb-6 group-hover:scale-125 transition-transform duration-300"></i>
+                        <h3 class="font-display text-2xl font-bold uppercase mb-2">Community Suite</h3>
+                        <p class="text-gray-400 text-sm mb-6">Build, customize, and share content with the global
+                            community. Tools to create Superstars, Arenas, Championships, and more.</p>
+                        <div class="panel-description">
+                            <div class="space-y-2 text-xs text-gray-500 border-t border-gray-700 pt-4">
+                                <p>✓ Creation Tools</p>
+                                <p>✓ Content Sharing</p>
+                                <p>✓ Community Hub</p>
+                                <p>✓ Collaboration</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="feature-card-enhanced bg-gradient-to-br from-brand-panel to-black p-8 border border-cyan-500/30 hover:border-cyan-500/70 group">
+                        <i
+                            class="fa-solid fa-crown text-4xl text-cyan-400 mb-6 group-hover:scale-125 transition-transform duration-300"></i>
+                        <h3 class="font-display text-2xl font-bold uppercase mb-2">GM Mode</h3>
+                        <p class="text-gray-400 text-sm mb-6">Manage your promotion like a true leader. Book matches,
+                            develop storylines, manage finances, and grow your brand empire.</p>
+                        <div class="panel-description">
+                            <div class="space-y-2 text-xs text-gray-500 border-t border-gray-700 pt-4">
+                                <p>✓ Match Booking</p>
+                                <p>✓ Storyline Development</p>
+                                <p>✓ Financial Management</p>
+                                <p>✓ Brand Development</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Gallery (Screenshots) -->
+            <div class="py-24 bg-[#0a0a0a] border-t border-brand-border">
+                <div class="max-w-7xl mx-auto px-4">
+                    <h2 class="font-display text-4xl font-bold uppercase italic mb-10 text-center">Visual <span
+                            class="text-brand-blue">Showcase</span></h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div
+                            class="group relative overflow-hidden border border-brand-border aspect-video rounded button-animated">
+                            <img src="assets/screenshots/screenshot-mainmenu.png"
+                                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+                                alt="Main Menu"
+                                onerror="this.src='https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=800'">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            </div>
+                            <div
+                                class="absolute bottom-0 left-0 bg-gradient-to-r from-black to-transparent w-full p-3 text-sm font-bold uppercase text-white translate-y-full group-hover:translate-y-0 transition-transform">
+                                Main Menu</div>
+                        </div>
+                        <div
+                            class="group relative overflow-hidden border border-brand-border aspect-video rounded button-animated">
+                            <img src="assets/screenshots/screenshot-career.png"
+                                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+                                alt="Career Modes"
+                                onerror="this.src='https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=800'">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            </div>
+                            <div
+                                class="absolute bottom-0 left-0 bg-gradient-to-r from-black to-transparent w-full p-3 text-sm font-bold uppercase text-white translate-y-full group-hover:translate-y-0 transition-transform">
+                                Career Modes</div>
+                        </div>
+                        <div
+                            class="group relative overflow-hidden border border-brand-border aspect-video rounded button-animated">
+                            <img src="assets/screenshots/screenshot-creation.png"
+                                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+                                alt="Creation Suite"
+                                onerror="this.src='https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=800'">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            </div>
+                            <div
+                                class="absolute bottom-0 left-0 bg-gradient-to-r from-black to-transparent w-full p-3 text-sm font-bold uppercase text-white translate-y-full group-hover:translate-y-0 transition-transform">
+                                Creation Suite</div>
+                        </div>
+                        <div
+                            class="group relative overflow-hidden border border-brand-border aspect-video rounded button-animated">
+                            <img src="assets/screenshots/screenshot-rosters.png"
+                                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+                                alt="Roster Select"
+                                onerror="this.src='https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=800'">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            </div>
+                            <div
+                                class="absolute bottom-0 left-0 bg-gradient-to-r from-black to-transparent w-full p-3 text-sm font-bold uppercase text-white translate-y-full group-hover:translate-y-0 transition-transform">
+                                Global Rosters</div>
+                        </div>
+                        <div
+                            class="group relative overflow-hidden border border-brand-border aspect-video rounded button-animated">
+                            <img src="assets/screenshots/screenshot-championship.png"
+                                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+                                alt="Belt Editor"
+                                onerror="this.src='https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=800'">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            </div>
+                            <div
+                                class="absolute bottom-0 left-0 bg-gradient-to-r from-black to-transparent w-full p-3 text-sm font-bold uppercase text-white translate-y-full group-hover:translate-y-0 transition-transform">
+                                Championship Editor</div>
+                        </div>
+                        <div
+                            class="group relative overflow-hidden border border-brand-border aspect-video rounded button-animated">
+                            <img src="assets/screenshots/screenshot-calendar.png"
+                                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+                                alt="GM Calendar"
+                                onerror="this.src='https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=800'">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            </div>
+                            <div
+                                class="absolute bottom-0 left-0 bg-gradient-to-r from-black to-transparent w-full p-3 text-sm font-bold uppercase text-white translate-y-full group-hover:translate-y-0 transition-transform">
+                                GM Calendar</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMMUNITY SUITE -->
+        <section id="page-mods" class="page-section bg-brand-dark min-h-screen pt-24 pb-20">
+            <div
+                class="bg-gradient-to-r from-brand-blue/20 via-brand-panel to-brand-red/20 border-b border-brand-border pt-12 pb-8 px-4 animate-slide-in-down">
+                <div class="max-w-7xl mx-auto">
+                    <h2 class="font-display text-6xl md:text-7xl font-bold uppercase mb-2">Community <span
+                            class="text-brand-blue">Suite</span></h2>
+                    <p class="text-gray-400 text-sm mb-8">Create, share, and discover amazing content from our global
+                        community. Explore thousands of custom superstars, arenas, and championships.</p>
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="relative flex-grow">
+                            <i
+                                class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                            <input type="text" id="mod-search" placeholder="Search Superstars, Arenas, Belts..."
+                                class="w-full bg-black border border-brand-blue/30 hover:border-brand-blue/50 focus:border-brand-blue text-white pl-12 pr-4 py-4 focus:outline-none font-display uppercase tracking-wider transition-all rounded">
+                        </div>
+                        <div class="flex gap-2 overflow-x-auto pb-2 md:pb-0">
+                            <button onclick="modHub.filter('all')"
+                                class="mod-filter button-animated active px-6 py-4 bg-brand-blue text-white font-bold uppercase text-sm whitespace-nowrap rounded shadow-lg shadow-brand-blue/30">All</button>
+                            <button onclick="modHub.filter('superstar')"
+                                class="mod-filter button-animated px-6 py-4 bg-brand-panel border border-brand-border hover:bg-brand-border text-gray-300 font-bold uppercase text-sm whitespace-nowrap rounded transition-all">⭐
+                                Superstars</button>
+                            <button onclick="modHub.filter('arena')"
+                                class="mod-filter button-animated px-6 py-4 bg-brand-panel border border-brand-border hover:bg-brand-border text-gray-300 font-bold uppercase text-sm whitespace-nowrap rounded transition-all">🏟️
+                                Arenas</button>
+                            <button onclick="modHub.filter('belt')"
+                                class="mod-filter button-animated px-6 py-4 bg-brand-panel border border-brand-border hover:bg-brand-border text-gray-300 font-bold uppercase text-sm whitespace-nowrap rounded transition-all">👑
+                                Championships</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="max-w-7xl mx-auto px-4 mt-8">
+                <div id="mod-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+                <div class="text-center mt-12"><button
+                        class="button-animated text-gray-500 hover:text-white font-display uppercase tracking-widest text-sm border-b border-gray-500 pb-1 transition-all">Load
+                        More Content</button></div>
+            </div>
+        </section>
+
+        <!-- WIKI / DOCS -->
+        <section id="page-docs" class="page-section wiki-page min-h-screen pt-20">
+            <div class="flex flex-col md:flex-row min-h-screen">
+                <div
+                    class="w-full md:w-80 bg-gradient-to-b from-brand-blue/10 via-brand-panel to-black border-r border-brand-blue/30 border-t border-brand-border pt-8 px-6 animate-slide-in-down">
+                    <div class="flex items-center gap-3 mb-8">
+                        <i class="fa-solid fa-book text-brand-blue text-2xl"></i>
+                        <h3 class="font-display text-xl font-bold uppercase tracking-widest text-white">Documentation
+                        </h3>
+                    </div>
+                    <div class="wiki-nav space-y-2">
+                        <button onclick="docs.show('intro')"
+                            class="w-full text-left px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-brand-blue/10 rounded transition-all active border-l-4 border-brand-blue bg-brand-blue/5 font-semibold button-animated">
+                            <i class="fa-solid fa-play mr-2 text-brand-blue"></i>Getting Started</button>
+                        <button onclick="docs.show('install_android')"
+                            class="w-full text-left px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-brand-red/10 rounded transition-all border-l-4 border-transparent font-medium button-animated hover:border-brand-red">
+                            <i class="fa-brands fa-android mr-2 text-brand-red"></i>Android Setup</button>
+                        <button onclick="docs.show('install_win')"
+                            class="w-full text-left px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-brand-red/10 rounded transition-all border-l-4 border-transparent font-medium button-animated hover:border-brand-red">
+                            <i class="fa-brands fa-windows mr-2 text-brand-red"></i>Windows Setup</button>
+                        <button onclick="docs.show('costumes')"
+                            class="w-full text-left px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-brand-gold/10 rounded transition-all border-l-4 border-transparent font-medium button-animated hover:border-brand-gold">
+                            <i class="fa-solid fa-palette mr-2 text-brand-gold"></i>Customization</button>
+                        <button onclick="docs.show('roster')"
+                            class="w-full text-left px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-brand-gold/10 rounded transition-all border-l-4 border-transparent font-medium button-animated hover:border-brand-gold">
+                            <i class="fa-solid fa-users mr-2 text-brand-gold"></i>Rosters & Titles</button>
+                        <button onclick="docs.show('media')"
+                            class="w-full text-left px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-brand-blue/10 rounded transition-all border-l-4 border-transparent font-medium button-animated hover:border-brand-blue">
+                            <i class="fa-solid fa-music mr-2 text-brand-blue"></i>Media & Audio</button>
+                        <button onclick="docs.show('loader')"
+                            class="w-full text-left px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-brand-blue/10 rounded transition-all border-l-4 border-transparent font-medium button-animated hover:border-brand-blue">
+                            <i class="fa-solid fa-gears mr-2 text-brand-blue"></i>Asset Loader</button>
+                    </div>
+                </div>
+                <div
+                    class="flex-grow p-8 md:p-12 overflow-y-auto bg-gradient-to-br from-black/80 via-black to-black/80 backdrop-blur-sm">
+                    <div id="doc-content" class="max-w-4xl mx-auto text-gray-200 leading-relaxed animate-fade-scale">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PATCH NOTES / UPDATES -->
+        <section id="page-patch" class="page-section patch-page min-h-screen pt-24 py-12 px-4">
+            <div class="max-w-5xl mx-auto">
+                <div
+                    class="flex flex-col md:flex-row items-start md:items-center justify-between mb-16 animate-slide-in-down">
+                    <div>
+                        <h2 class="font-display text-5xl font-bold uppercase mb-2">Live <span
+                                class="text-brand-red bg-gradient-to-r from-brand-red to-red-400 bg-clip-text text-transparent">Updates</span>
+                        </h2>
+                        <p class="text-gray-400 text-sm">Latest patches, fixes, and new features</p>
+                    </div>
+                    <div
+                        class="flex items-center gap-3 mt-6 md:mt-0 bg-gradient-to-r from-brand-red/20 to-black px-4 py-2 rounded-lg border border-brand-red/50 button-animated">
+                        <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                        <span class="text-xs font-mono text-gray-300">LIVE SERVER</span>
+                    </div>
+                </div>
+                <div id="patch-feed" class="space-y-6"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gradient-to-r from-brand-panel via-black to-brand-panel border-t border-brand-border py-12">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="flex flex-col items-center md:items-start text-center md:text-left">
+                <img src="assets/logos/LogoSmall.png" alt="WRES REP"
+                    class="h-14 md:h-16 mb-4 opacity-90 hover:opacity-100 transition-opacity hover:drop-shadow-lg"
+                    onerror="this.src='https://placehold.co/200x50/000000/FFF?text=WRES+REP'">
+                <p class="text-gray-500 text-xs max-w-sm">
+                    &copy; 2025 MNDRiN Studios. All rights reserved.<br>
+                    Developed for Human race. Wres Republica is a freeware.
+                </p>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <a href="https://discord.gg" target="_blank"
+                    class="w-12 h-12 flex items-center justify-center rounded-full bg-brand-dark border border-brand-border text-gray-400 hover:text-white hover:border-brand-blue hover:bg-brand-blue/10 transition-all duration-300 group button-animated">
+                    <i class="fa-brands fa-discord text-xl group-hover:scale-110 transition-transform"></i>
+                </a>
+                <a href="https://youtube.com" target="_blank"
+                    class="w-12 h-12 flex items-center justify-center rounded-full bg-brand-dark border border-brand-border text-gray-400 hover:text-white hover:border-red-600 hover:bg-red-600/10 transition-all duration-300 group button-animated">
+                    <i class="fa-brands fa-youtube text-xl group-hover:scale-110 transition-transform"></i>
+                </a>
+                <a href="https://instagram.com" target="_blank"
+                    class="w-12 h-12 flex items-center justify-center rounded-full bg-brand-dark border border-brand-border text-gray-400 hover:text-white hover:border-pink-600 hover:bg-pink-600/10 transition-all duration-300 group button-animated">
+                    <i class="fa-brands fa-instagram text-xl group-hover:scale-110 transition-transform"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- DOWNLOAD MODAL -->
+    <div id="download-modal"
+        class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-xl hidden flex items-center justify-center p-4 modal-backdrop-blur">
+        <div
+            class="bg-gradient-to-br from-brand-panel via-black to-brand-panel border border-brand-blue/50 w-full max-w-2xl relative shadow-2xl animate-modal-slide-in overflow-hidden">
+            <div
+                class="absolute inset-0 bg-gradient-to-r from-brand-blue/10 to-brand-red/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            </div>
+            <button onclick="downloadManager.closeModal()"
+                class="absolute top-4 right-4 text-gray-500 hover:text-white hover:scale-125 transition-transform z-20 cursor-pointer bg-transparent border-none p-2"><i
+                    class="fa-solid fa-xmark text-2xl"></i></button>
+            <div class="p-8 relative z-10">
+                <h3 class="font-display text-3xl font-bold uppercase mb-2">Select <span
+                        class="text-brand-blue">Edition</span></h3>
+                <p class="text-gray-400 text-sm mb-8">Choose your platform. Ensure you have enabled "Install from
+                    Unknown Sources" on Android.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="border border-brand-blue/30 hover:border-brand-blue p-6 bg-gradient-to-br from-brand-blue/5 to-transparent hover:from-brand-blue/10 transition-all cursor-pointer group button-animated"
+                        onclick="downloadManager.start('win')">
+                        <i
+                            class="fa-brands fa-windows text-4xl text-gray-500 group-hover:text-brand-blue mb-4 transition-colors"></i>
+                        <h4 class="font-bold text-white uppercase mb-1">Windows PC (x64)</h4>
+                        <p class="text-xs text-gray-500 group-hover:text-gray-300">v1.0.4 • 4.5GB • .EXE Installer</p>
+                    </div>
+                    <div class="border border-brand-red/30 hover:border-brand-red p-6 bg-gradient-to-br from-brand-red/5 to-transparent hover:from-brand-red/10 transition-all cursor-pointer group button-animated"
+                        onclick="downloadManager.start('android')">
+                        <i
+                            class="fa-brands fa-android text-4xl text-gray-500 group-hover:text-brand-red mb-4 transition-colors"></i>
+                        <h4 class="font-bold text-white uppercase mb-1">Android (ARM64)</h4>
+                        <p class="text-xs text-gray-500 group-hover:text-gray-300">v1.0.4 • 1.2GB • .APK File</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-black/50 p-4 border-t border-brand-border text-center relative z-10">
+                <p class="text-xs text-gray-500">By downloading, you agree to the EULA. <span
+                        class="text-brand-red">Wres Republica is strictly freeware.</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <!-- External Modules -->
+    <script src="js/dataService.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/modHub.js"></script>
+    <script src="js/docs.js"></script>
+    <script src="js/patchNotes.js"></script>
+    <script src="js/downloadManager.js"></script>
+    <script src="js/mobileMenu.js"></script>
+
+    <!-- App Initialization -->
+    <script src="js/app.js"></script>
+</body>
+
+</html>
